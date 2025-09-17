@@ -17,15 +17,15 @@ export const isInputFocused = () => {
 export function useKeyboardShortcuts({
   selectedTaskIndex,
   todos,
-  setTodos,
-  setSelectedTaskIndex,
-  setIsAddModalOpen,
+  setTodosAction,
+  setSelectedTaskIndexAction,
+  setIsAddModalOpenAction,
 }: {
   selectedTaskIndex: number
   todos: any[]
-  setTodos: React.Dispatch<React.SetStateAction<any[]>>
-  setSelectedTaskIndex: React.Dispatch<React.SetStateAction<number>>
-  setIsAddModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setTodosAction: React.Dispatch<React.SetStateAction<any[]>>
+  setSelectedTaskIndexAction: React.Dispatch<React.SetStateAction<number>>
+  setIsAddModalOpenAction: React.Dispatch<React.SetStateAction<boolean>>
 }) {
   const { theme, setTheme } = useTheme()
 
@@ -45,13 +45,13 @@ export function useKeyboardShortcuts({
       // Navigation keys
       if (e.key === "j" && !e.shiftKey) {
         // Move down (next task)
-        setSelectedTaskIndex((prev) => Math.min(prev + 1, todos.length - 1))
+        setSelectedTaskIndexAction((prev) => Math.min(prev + 1, todos.length - 1))
       } else if (e.key === "k" && !e.shiftKey) {
         // Move up (previous task)
-        setSelectedTaskIndex((prev) => Math.max(prev - 1, 0))
+        setSelectedTaskIndexAction((prev) => Math.max(prev - 1, 0))
       } else if (e.key === " " || e.key === "Spacebar") {
         // Toggle the selected task
-        setTodos((prevTodos) =>
+        setTodosAction((prevTodos) =>
           prevTodos.map((todo, index) =>
             index === selectedTaskIndex
               ? { ...todo, completed: !todo.completed }
@@ -74,21 +74,21 @@ export function useKeyboardShortcuts({
           localStorage.setItem('deletedTodos', JSON.stringify(limitedDeletedTodos));
         }
         
-        setTodos((prevTodos) => {
+        setTodosAction((prevTodos) => {
           const newTodos = prevTodos.filter((_, index) => index !== selectedTaskIndex)
           // Adjust selected index if necessary
           if (newTodos.length > 0 && selectedTaskIndex >= newTodos.length) {
-            setSelectedTaskIndex(newTodos.length - 1)
+            setSelectedTaskIndexAction(newTodos.length - 1)
           } else if (newTodos.length === 0) {
-            setSelectedTaskIndex(0)
+            setSelectedTaskIndexAction(0)
           } else if (selectedTaskIndex > newTodos.length - 1) {
-            setSelectedTaskIndex(newTodos.length - 1)
+            setSelectedTaskIndexAction(newTodos.length - 1)
           }
           return newTodos
         })
       } else if (e.key === "n") {
         // Open add task modal
-        setIsAddModalOpen(true)
+        setIsAddModalOpenAction(true)
       } else if (e.key === "o" || e.key === "O") {
         // Toggle dark mode
         setTheme(theme === "dark" ? "light" : "dark")
@@ -113,13 +113,13 @@ export function useKeyboardShortcuts({
           localStorage.setItem('deletedTodos', JSON.stringify(limitedDeletedTodos));
         }
         
-        setTodos((prevTodos) => {
+        setTodosAction((prevTodos) => {
           const newTodos = prevTodos.filter((todo) => !todo.completed)
           // Adjust selected index if necessary
           if (newTodos.length > 0 && selectedTaskIndex >= newTodos.length) {
-            setSelectedTaskIndex(newTodos.length - 1)
+            setSelectedTaskIndexAction(newTodos.length - 1)
           } else if (newTodos.length === 0) {
-            setSelectedTaskIndex(0)
+            setSelectedTaskIndexAction(0)
           }
           return newTodos
         })
@@ -136,12 +136,12 @@ export function useKeyboardShortcuts({
             const updatedDeletedTodos = deletedTodos.slice(1);
             localStorage.setItem('deletedTodos', JSON.stringify(updatedDeletedTodos));
             
-            setTodos((prevTodos) => {
+            setTodosAction((prevTodos) => {
               // Insert the todo back at its original position or at the end if position is invalid
               const insertIndex = Math.min(lastDeleted.index, prevTodos.length);
               const newTodos = [...prevTodos];
               newTodos.splice(insertIndex, 0, lastDeleted.todo);
-              setSelectedTaskIndex(insertIndex);
+              setSelectedTaskIndexAction(insertIndex);
               return newTodos;
             });
           }
@@ -149,24 +149,24 @@ export function useKeyboardShortcuts({
       } else if (e.key === "J" || (e.key === "j" && e.shiftKey)) {
         // Move selected task down
         if (selectedTaskIndex < todos.length - 1) {
-          setTodos((prevTodos) => {
+          setTodosAction((prevTodos) => {
             const newTodos = [...prevTodos]
             const temp = newTodos[selectedTaskIndex]
             newTodos[selectedTaskIndex] = newTodos[selectedTaskIndex + 1]
             newTodos[selectedTaskIndex + 1] = temp
-            setSelectedTaskIndex(selectedTaskIndex + 1)
+            setSelectedTaskIndexAction(selectedTaskIndex + 1)
             return newTodos
           })
         }
       } else if (e.key === "K" || (e.key === "k" && e.shiftKey)) {
         // Move selected task up
         if (selectedTaskIndex > 0) {
-          setTodos((prevTodos) => {
+          setTodosAction((prevTodos) => {
             const newTodos = [...prevTodos]
             const temp = newTodos[selectedTaskIndex]
             newTodos[selectedTaskIndex] = newTodos[selectedTaskIndex - 1]
             newTodos[selectedTaskIndex - 1] = temp
-            setSelectedTaskIndex(selectedTaskIndex - 1)
+            setSelectedTaskIndexAction(selectedTaskIndex - 1)
             return newTodos
           })
         }
@@ -178,9 +178,9 @@ export function useKeyboardShortcuts({
   }, [
     selectedTaskIndex,
     todos,
-    setTodos,
-    setSelectedTaskIndex,
-    setIsAddModalOpen,
+    setTodosAction,
+    setSelectedTaskIndexAction,
+    setIsAddModalOpenAction,
     theme,
     setTheme,
   ])

@@ -121,9 +121,9 @@ export default function Home() {
   useKeyboardShortcuts({
     selectedTaskIndex,
     todos,
-    setTodos,
-    setSelectedTaskIndex,
-    setIsAddModalOpen,
+    setTodosAction: setTodos,
+    setSelectedTaskIndexAction: setSelectedTaskIndex,
+    setIsAddModalOpenAction: setIsAddModalOpen,
   });
 
   // Show loading state until todos are loaded
@@ -133,18 +133,18 @@ export default function Home() {
         <ModeToggle />
         <div className="w-full max-w-md">
           <Card>
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl min-h-[2rem]">
-                <span className="invisible">Placeholder</span>
+            <CardHeader className="text-center p-6">
+              <CardTitle className="text-2xl h-9 flex items-center justify-center mb-2">
+                <div className="h-7 bg-muted rounded w-52"></div>
               </CardTitle>
-              <CardDescription>
-                Loading...
+              <CardDescription className="h-6 flex items-center justify-center">
+                <span className="h-5 bg-muted rounded w-36 inline-block"></span>
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+            <CardContent className="p-6">
+              <div className="space-y-4">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-12 bg-muted rounded-lg animate-pulse"></div>
+                  <div key={i} className="h-14 bg-muted rounded-lg"></div>
                 ))}
               </div>
             </CardContent>
@@ -159,15 +159,15 @@ export default function Home() {
       <ModeToggle />
       <div className="w-full max-w-md">
         <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl min-h-[2rem]">
+          <CardHeader className="text-center p-6">
+            <CardTitle className="text-2xl h-9 flex items-center justify-center mb-2">
               {isClient && todoListName ? todoListName : <span className="invisible">Placeholder</span>}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="h-6 flex items-center justify-center">
               {isClient ? `${remainingTasks} ${remainingTasks === 1 ? 'task' : 'tasks'} remaining` : "Loading..."}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             <TodoList 
               todos={todos} 
               onToggle={(id) => setTodos(todos.map(todo => 
@@ -175,7 +175,7 @@ export default function Home() {
               ))}
               onDelete={(id) => setTodos(todos.filter(todo => todo.id !== id))}
               selectedTaskIndex={selectedTaskIndex}
-              className="space-y-3"
+              className="space-y-4"
             />
           </CardContent>
         </Card>
