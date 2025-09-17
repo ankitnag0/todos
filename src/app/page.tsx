@@ -1,103 +1,133 @@
-import Image from "next/image";
+"use client"
+
+import * as React from "react"
+import { TodoList } from "@/components/ui/todo-list";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { AddTaskModal } from "@/components/add-task-modal";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  // Hard-coded todos data
+  const [todos, setTodos] = React.useState([
+    {
+      id: "1",
+      title: "Learn Next.js 15",
+      completed: true,
+    },
+    {
+      id: "2",
+      title: "Build a todo app with shadcn/ui",
+      completed: true,
+    },
+    {
+      id: "3",
+      title: "Deploy to Vercel",
+      completed: false,
+    },
+    {
+      id: "4",
+      title: "Add animations and transitions",
+      completed: false,
+    },
+    {
+      id: "5",
+      title: "Write documentation",
+      completed: false,
+    },
+  ]);
+  
+  const [selectedTaskIndex, setSelectedTaskIndex] = React.useState(0);
+  const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const handleToggle = (id: string) => {
+    setTodos(todos.map(todo => 
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    ));
+  };
+
+  const handleDelete = (id: string) => {
+    setTodos(todos.filter(todo => todo.id !== id));
+    // Adjust selected index if necessary
+    if (todos.length > 1 && selectedTaskIndex >= todos.length - 1) {
+      setSelectedTaskIndex(todos.length - 2);
+    }
+  };
+  
+  const handleAddTask = (title: string) => {
+    const newTask = {
+      id: Date.now().toString(),
+      title,
+      completed: false,
+    };
+    setTodos([...todos, newTask]);
+    // Select the newly added task
+    setSelectedTaskIndex(todos.length);
+  };
+
+  const remainingTasks = todos.filter(todo => !todo.completed).length;
+  
+  // Handle keyboard navigation
+  React.useEffect(() => {
+    // Focus the document body to ensure keyboard events are captured
+    document.body.focus();
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent default behavior for keys we're using
+      if (['j', 'k', ' ', 'Spacebar', 'd', 'n'].includes(e.key)) {
+        e.preventDefault();
+      }
+      
+      if (e.key === 'j') {
+        // Move down (next task)
+        setSelectedTaskIndex(prev => Math.min(prev + 1, todos.length - 1));
+      } else if (e.key === 'k') {
+        // Move up (previous task)
+        setSelectedTaskIndex(prev => Math.max(prev - 1, 0));
+      } else if (e.key === ' ' || e.key === 'Spacebar') {
+        // Toggle the selected task
+        handleToggle(todos[selectedTaskIndex].id);
+      } else if (e.key === 'd') {
+        // Delete the selected task
+        handleDelete(todos[selectedTaskIndex].id);
+      } else if (e.key === 'n') {
+        // Open add task modal
+        setIsAddModalOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [todos, selectedTaskIndex]);
+
+  return (
+    <div className="min-h-screen bg-background p-8" tabIndex={-1}>
+      <div className="max-w-md mx-auto pt-12">
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">My Tasks</CardTitle>
+            <CardDescription>
+              {remainingTasks} {remainingTasks === 1 ? 'task' : 'tasks'} remaining
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TodoList 
+              todos={todos} 
+              onToggle={handleToggle}
+              onDelete={handleDelete}
+              selectedTaskIndex={selectedTaskIndex}
+              className="space-y-3"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <AddTaskModal 
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAdd={(title) => {
+          handleAddTask(title);
+          setIsAddModalOpen(false);
+        }}
+      />
     </div>
   );
 }
