@@ -20,12 +20,14 @@ export function useKeyboardShortcuts({
   setTodosAction,
   setSelectedTaskIndexAction,
   setIsAddModalOpenAction,
+  setIsHelpModalOpenAction,
 }: {
   selectedTaskIndex: number
   todos: any[]
   setTodosAction: React.Dispatch<React.SetStateAction<any[]>>
   setSelectedTaskIndexAction: React.Dispatch<React.SetStateAction<number>>
   setIsAddModalOpenAction: React.Dispatch<React.SetStateAction<boolean>>
+  setIsHelpModalOpenAction: React.Dispatch<React.SetStateAction<boolean>>
 }) {
   const { theme, setTheme } = useTheme()
 
@@ -38,7 +40,7 @@ export function useKeyboardShortcuts({
       if (isInputFocused()) return
 
       // Prevent default behavior for keys we're using
-      if (["j", "k", " ", "Spacebar", "d", "n", "o", "O", "x", "X", "u", "U"].includes(e.key)) {
+      if (["j", "k", " ", "Spacebar", "d", "n", "o", "O", "?", "x", "X", "u", "U"].includes(e.key)) {
         e.preventDefault()
       }
 
@@ -92,6 +94,9 @@ export function useKeyboardShortcuts({
       } else if (e.key === "o" || e.key === "O") {
         // Toggle dark mode
         setTheme(theme === "dark" ? "light" : "dark")
+      } else if (e.key === "?") {
+        // Open help modal
+        setIsHelpModalOpenAction(true)
       } else if (e.key === "x" || e.key === "X") {
         // Delete all completed tasks
         const completedTodos = todos.filter((todo) => todo.completed);
@@ -181,6 +186,7 @@ export function useKeyboardShortcuts({
     setTodosAction,
     setSelectedTaskIndexAction,
     setIsAddModalOpenAction,
+    setIsHelpModalOpenAction,
     theme,
     setTheme,
   ])

@@ -1,0 +1,63 @@
+"use client"
+
+import * as React from "react"
+
+interface HelpModalProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export function HelpModal({ isOpen, onClose }: HelpModalProps) {
+  if (!isOpen) return null
+
+  // Handle escape key to close the modal
+  React.useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose()
+      }
+    }
+
+    document.addEventListener("keydown", handleEscape)
+    return () => document.removeEventListener("keydown", handleEscape)
+  }, [onClose])
+
+  const shortcuts = [
+    { key: "j", description: "Navigate down" },
+    { key: "k", description: "Navigate up" },
+    { key: "n", description: "New task" },
+    { key: "d", description: "Delete task" },
+    { key: "Space", description: "Toggle task" },
+    { key: "x", description: "Delete completed" },
+    { key: "Shift + J", description: "Move task down" },
+    { key: "Shift + K", description: "Move task up" },
+    { key: "u", description: "Undo delete" },
+    { key: "o", description: "Toggle dark mode" },
+    { key: "?", description: "Show help" },
+  ]
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-background rounded-lg border p-6 w-full max-w-lg shadow-lg relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="grid grid-cols-2 gap-3">
+          {shortcuts.map((shortcut, index) => (
+            <div key={index} className="flex items-center justify-between py-1">
+              <kbd className="px-2 py-1 text-xs rounded bg-muted font-mono mr-2 whitespace-nowrap">
+                {shortcut.key}
+              </kbd>
+              <span className="text-sm text-muted-foreground truncate text-center">
+                {shortcut.description}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}

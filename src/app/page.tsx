@@ -5,6 +5,7 @@ import { TodoList } from "@/components/ui/todo-list";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { AddTaskModal } from "@/components/add-task-modal";
 import { ModeToggle } from "@/components/mode-toggle";
+import { HelpModal } from "@/components/help-modal";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { getCycledTodoListName } from "@/lib/todo-list-names";
 
@@ -14,6 +15,7 @@ export default function Home() {
   const [isTodosLoaded, setIsTodosLoaded] = React.useState(false);
   const [selectedTaskIndex, setSelectedTaskIndex] = React.useState(0);
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
+  const [isHelpModalOpen, setIsHelpModalOpen] = React.useState(false);
   const [todoListName, setTodoListName] = React.useState<string | null>(null);
   const [isClient, setIsClient] = React.useState(false);
 
@@ -124,6 +126,7 @@ export default function Home() {
     setTodosAction: setTodos,
     setSelectedTaskIndexAction: setSelectedTaskIndex,
     setIsAddModalOpenAction: setIsAddModalOpen,
+    setIsHelpModalOpenAction: setIsHelpModalOpen,
   });
 
   // Show loading state until todos are loaded
@@ -195,6 +198,11 @@ export default function Home() {
           setSelectedTaskIndex(todos.length);
           setIsAddModalOpen(false);
         }}
+      />
+      
+      <HelpModal 
+        isOpen={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
       />
     </div>
   );
