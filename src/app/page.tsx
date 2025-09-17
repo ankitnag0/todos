@@ -4,6 +4,8 @@ import * as React from "react"
 import { TodoList } from "@/components/ui/todo-list";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { AddTaskModal } from "@/components/add-task-modal";
+import { KeyboardShortcut } from "@/components/keyboard-shortcut";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Home() {
   // Hard-coded todos data
@@ -100,6 +102,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background p-8" tabIndex={-1}>
+      <KeyboardShortcut />
+      <ModeToggle />
       <div className="max-w-md mx-auto pt-12">
         <Card>
           <CardHeader className="text-center">
