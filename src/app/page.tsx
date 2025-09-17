@@ -36,6 +36,31 @@ export default function Home() {
       title: "Write documentation",
       completed: false,
     },
+    {
+      id: "6",
+      title: "Add unit tests",
+      completed: false,
+    },
+    {
+      id: "7",
+      title: "Optimize performance",
+      completed: false,
+    },
+    {
+      id: "8",
+      title: "Add dark mode",
+      completed: true,
+    },
+    {
+      id: "9",
+      title: "Implement keyboard shortcuts",
+      completed: true,
+    },
+    {
+      id: "10",
+      title: "Add virtual scrolling",
+      completed: false,
+    },
   ]);
   
   const [selectedTaskIndex, setSelectedTaskIndex] = React.useState(0);
@@ -102,9 +127,9 @@ export default function Home() {
   });
 
   return (
-    <div className="min-h-screen bg-background p-8" tabIndex={-1}>
+    <div className="min-h-screen bg-background p-4 flex items-center justify-center" tabIndex={-1}>
       <ModeToggle />
-      <div className="max-w-md mx-auto pt-12">
+      <div className="w-full max-w-md">
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-2xl min-h-[2rem]">
