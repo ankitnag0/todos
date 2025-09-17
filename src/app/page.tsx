@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { AddTaskModal } from "@/components/add-task-modal";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { getCycledTodoListName } from "@/lib/todo-list-names";
 
 export default function Home() {
   // Hard-coded todos data
@@ -39,6 +40,29 @@ export default function Home() {
   
   const [selectedTaskIndex, setSelectedTaskIndex] = React.useState(0);
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
+  const [todoListName, setTodoListName] = React.useState<string | null>(null);
+  const [isClient, setIsClient] = React.useState(false);
+
+  // Initialize and update the todo list name based on visit count
+  React.useEffect(() => {
+    setIsClient(true);
+    
+    // Get visit count from localStorage
+    const storedVisitCount = localStorage.getItem("todoVisitCount");
+    const newVisitCount = storedVisitCount ? parseInt(storedVisitCount, 10) + 1 : 0;
+    
+    // Get the new name for this visit
+    const newName = getCycledTodoListName(newVisitCount);
+    
+    // Save updated visit count
+    localStorage.setItem("todoVisitCount", newVisitCount.toString());
+    
+    // Save the current name for next visit
+    localStorage.setItem("currentTodoListName", newName);
+    
+    // Set the todo list name for this visit
+    setTodoListName(newName);
+  }, []);
 
   const handleToggle = (id: string) => {
     setTodos(todos.map(todo => 
@@ -83,7 +107,9 @@ export default function Home() {
       <div className="max-w-md mx-auto pt-12">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">My Tasks</CardTitle>
+            <CardTitle className="text-2xl min-h-[2rem]">
+              {isClient && todoListName ? todoListName : <span className="invisible">Placeholder</span>}
+            </CardTitle>
             <CardDescription>
               {remainingTasks} {remainingTasks === 1 ? 'task' : 'tasks'} remaining
             </CardDescription>
