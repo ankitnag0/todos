@@ -32,56 +32,31 @@ export default function Home() {
         setSelectedTaskIndex(Math.max(0, parsedTodos.length - 1));
       }
     } else {
-      // If no saved todos, use the default list
+      // If no saved todos, use the default list as a guide
       setTodos([
         {
           id: "1",
-          title: "Learn Next.js 15",
-          completed: true,
+          title: "Use j/k to move up and down",
+          completed: false,
         },
         {
           id: "2",
-          title: "Build a todo app with shadcn/ui",
-          completed: true,
+          title: "Press Space to check/uncheck task",
+          completed: false,
         },
         {
           id: "3",
-          title: "Deploy to Vercel",
+          title: "n to create new tasks",
           completed: false,
         },
         {
           id: "4",
-          title: "Add animations and transitions",
+          title: "d to delete selected task",
           completed: false,
         },
         {
           id: "5",
-          title: "Write documentation",
-          completed: false,
-        },
-        {
-          id: "6",
-          title: "Add unit tests",
-          completed: false,
-        },
-        {
-          id: "7",
-          title: "Optimize performance",
-          completed: false,
-        },
-        {
-          id: "8",
-          title: "Add dark mode",
-          completed: true,
-        },
-        {
-          id: "9",
-          title: "Implement keyboard shortcuts",
-          completed: true,
-        },
-        {
-          id: "10",
-          title: "Add virtual scrolling",
+          title: "? for help and all shortcuts",
           completed: false,
         },
       ]);
