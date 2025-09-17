@@ -4,8 +4,8 @@ import * as React from "react"
 import { TodoList } from "@/components/ui/todo-list";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { AddTaskModal } from "@/components/add-task-modal";
-import { KeyboardShortcut } from "@/components/keyboard-shortcut";
 import { ModeToggle } from "@/components/mode-toggle";
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 
 export default function Home() {
   // Hard-coded todos data
@@ -67,42 +67,18 @@ export default function Home() {
 
   const remainingTasks = todos.filter(todo => !todo.completed).length;
   
-  // Handle keyboard navigation
-  React.useEffect(() => {
-    // Focus the document body to ensure keyboard events are captured
-    document.body.focus();
-    
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Prevent default behavior for keys we're using
-      if (['j', 'k', ' ', 'Spacebar', 'd', 'n'].includes(e.key)) {
-        e.preventDefault();
-      }
-      
-      if (e.key === 'j') {
-        // Move down (next task)
-        setSelectedTaskIndex(prev => Math.min(prev + 1, todos.length - 1));
-      } else if (e.key === 'k') {
-        // Move up (previous task)
-        setSelectedTaskIndex(prev => Math.max(prev - 1, 0));
-      } else if (e.key === ' ' || e.key === 'Spacebar') {
-        // Toggle the selected task
-        handleToggle(todos[selectedTaskIndex].id);
-      } else if (e.key === 'd') {
-        // Delete the selected task
-        handleDelete(todos[selectedTaskIndex].id);
-      } else if (e.key === 'n') {
-        // Open add task modal
-        setIsAddModalOpen(true);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [todos, selectedTaskIndex]);
+  // Use our custom keyboard shortcuts hook
+  useKeyboardShortcuts({
+    selectedTaskIndex,
+    todos,
+    setSelectedTaskIndex,
+    handleToggle,
+    handleDelete,
+    setIsAddModalOpen,
+  });
 
   return (
     <div className="min-h-screen bg-background p-8" tabIndex={-1}>
-      <KeyboardShortcut />
       <ModeToggle />
       <div className="max-w-md mx-auto pt-12">
         <Card>
