@@ -8,7 +8,14 @@ interface HelpModalProps {
 }
 
 export function HelpModal({ isOpen, onClose }: HelpModalProps) {
-  if (!isOpen) return null
+  const [shouldRender, setShouldRender] = React.useState(isOpen)
+
+  // Update the render state when isOpen changes
+  React.useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true)
+    }
+  }, [isOpen])
 
   // Handle escape key to close the modal
   React.useEffect(() => {
@@ -36,12 +43,20 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
     { key: "?", description: "Show help" },
   ]
 
+  // Only render the modal content if shouldRender is true
+  if (!shouldRender) return null
+
+  // When closing, keep the component mounted but hide it
+  if (!isOpen) {
+    return <div className="hidden"></div>
+  }
+
   return (
-    <div
+    <div 
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
-      <div
+      <div 
         className="bg-background rounded-lg border p-6 w-full max-w-lg shadow-lg relative"
         onClick={(e) => e.stopPropagation()}
       >
