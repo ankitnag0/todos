@@ -38,7 +38,7 @@ export function useKeyboardShortcuts({
       if (isInputFocused()) return
 
       // Prevent default behavior for keys we're using
-      if (["j", "k", " ", "Spacebar", "d", "n", "o", "O", "x", "X"].includes(e.key)) {
+      if (["j", "k", " ", "Spacebar", "d", "n", "o", "O", "x", "X", "u", "U"].includes(e.key)) {
         e.preventDefault()
       }
 
@@ -60,6 +60,20 @@ export function useKeyboardShortcuts({
         )
       } else if (e.key === "d") {
         // Delete the selected task
+        const deletedTodo = todos[selectedTaskIndex];
+        if (deletedTodo) {
+          // Save deleted todo to localStorage for undo
+          const deletedTodos = JSON.parse(localStorage.getItem('deletedTodos') || '[]');
+          // Add the newly deleted todo to the beginning of the array
+          deletedTodos.unshift({
+            todo: deletedTodo,
+            index: selectedTaskIndex
+          });
+          // Keep only the last 10 deleted todos
+          const limitedDeletedTodos = deletedTodos.slice(0, 10);
+          localStorage.setItem('deletedTodos', JSON.stringify(limitedDeletedTodos));
+        }
+        
         setTodos((prevTodos) => {
           const newTodos = prevTodos.filter((_, index) => index !== selectedTaskIndex)
           // Adjust selected index if necessary
@@ -67,6 +81,8 @@ export function useKeyboardShortcuts({
             setSelectedTaskIndex(newTodos.length - 1)
           } else if (newTodos.length === 0) {
             setSelectedTaskIndex(0)
+          } else if (selectedTaskIndex > newTodos.length - 1) {
+            setSelectedTaskIndex(newTodos.length - 1)
           }
           return newTodos
         })
@@ -78,6 +94,25 @@ export function useKeyboardShortcuts({
         setTheme(theme === "dark" ? "light" : "dark")
       } else if (e.key === "x" || e.key === "X") {
         // Delete all completed tasks
+        const completedTodos = todos.filter((todo) => todo.completed);
+        if (completedTodos.length > 0) {
+          // Save deleted todos to localStorage for undo
+          const deletedTodos = JSON.parse(localStorage.getItem('deletedTodos') || '[]');
+          // Add the newly deleted todos with their original indices
+          const todosWithIndices = completedTodos.map(todo => {
+            const index = todos.findIndex(t => t.id === todo.id);
+            return {
+              todo: todo,
+              index: index
+            };
+          });
+          // Add to the beginning of the array
+          deletedTodos.unshift(...todosWithIndices);
+          // Keep only the last 10 deleted todos
+          const limitedDeletedTodos = deletedTodos.slice(0, 10);
+          localStorage.setItem('deletedTodos', JSON.stringify(limitedDeletedTodos));
+        }
+        
         setTodos((prevTodos) => {
           const newTodos = prevTodos.filter((todo) => !todo.completed)
           // Adjust selected index if necessary
@@ -88,6 +123,29 @@ export function useKeyboardShortcuts({
           }
           return newTodos
         })
+      } else if (e.key === "u" || e.key === "U") {
+        // Undo last delete
+        const deletedTodosStr = localStorage.getItem('deletedTodos');
+        if (deletedTodosStr) {
+          const deletedTodos = JSON.parse(deletedTodosStr);
+          if (deletedTodos.length > 0) {
+            // Get the most recently deleted todo
+            const lastDeleted = deletedTodos[0];
+            
+            // Remove the restored todo from deletedTodos and save back to localStorage
+            const updatedDeletedTodos = deletedTodos.slice(1);
+            localStorage.setItem('deletedTodos', JSON.stringify(updatedDeletedTodos));
+            
+            setTodos((prevTodos) => {
+              // Insert the todo back at its original position or at the end if position is invalid
+              const insertIndex = Math.min(lastDeleted.index, prevTodos.length);
+              const newTodos = [...prevTodos];
+              newTodos.splice(insertIndex, 0, lastDeleted.todo);
+              setSelectedTaskIndex(insertIndex);
+              return newTodos;
+            });
+          }
+        }
       } else if (e.key === "J" || (e.key === "j" && e.shiftKey)) {
         // Move selected task down
         if (selectedTaskIndex < todos.length - 1) {

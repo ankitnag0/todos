@@ -9,68 +9,94 @@ import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { getCycledTodoListName } from "@/lib/todo-list-names";
 
 export default function Home() {
-  // Hard-coded todos data
-  const [todos, setTodos] = React.useState([
-    {
-      id: "1",
-      title: "Learn Next.js 15",
-      completed: true,
-    },
-    {
-      id: "2",
-      title: "Build a todo app with shadcn/ui",
-      completed: true,
-    },
-    {
-      id: "3",
-      title: "Deploy to Vercel",
-      completed: false,
-    },
-    {
-      id: "4",
-      title: "Add animations and transitions",
-      completed: false,
-    },
-    {
-      id: "5",
-      title: "Write documentation",
-      completed: false,
-    },
-    {
-      id: "6",
-      title: "Add unit tests",
-      completed: false,
-    },
-    {
-      id: "7",
-      title: "Optimize performance",
-      completed: false,
-    },
-    {
-      id: "8",
-      title: "Add dark mode",
-      completed: true,
-    },
-    {
-      id: "9",
-      title: "Implement keyboard shortcuts",
-      completed: true,
-    },
-    {
-      id: "10",
-      title: "Add virtual scrolling",
-      completed: false,
-    },
-  ]);
-  
+  // Load todos from localStorage or use default todos
+  const [todos, setTodos] = React.useState<any[]>([]);
+  const [isTodosLoaded, setIsTodosLoaded] = React.useState(false);
   const [selectedTaskIndex, setSelectedTaskIndex] = React.useState(0);
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [todoListName, setTodoListName] = React.useState<string | null>(null);
   const [isClient, setIsClient] = React.useState(false);
 
-  // Initialize and update the todo list name based on visit count
+  // Load todos from localStorage on client mount
   React.useEffect(() => {
     setIsClient(true);
+    
+    const savedTodos = localStorage.getItem('todos');
+    if (savedTodos) {
+      const parsedTodos = JSON.parse(savedTodos);
+      setTodos(parsedTodos);
+      // Also update the selected index if needed
+      if (parsedTodos.length > 0 && selectedTaskIndex >= parsedTodos.length) {
+        setSelectedTaskIndex(Math.max(0, parsedTodos.length - 1));
+      }
+    } else {
+      // If no saved todos, use the default list
+      setTodos([
+        {
+          id: "1",
+          title: "Learn Next.js 15",
+          completed: true,
+        },
+        {
+          id: "2",
+          title: "Build a todo app with shadcn/ui",
+          completed: true,
+        },
+        {
+          id: "3",
+          title: "Deploy to Vercel",
+          completed: false,
+        },
+        {
+          id: "4",
+          title: "Add animations and transitions",
+          completed: false,
+        },
+        {
+          id: "5",
+          title: "Write documentation",
+          completed: false,
+        },
+        {
+          id: "6",
+          title: "Add unit tests",
+          completed: false,
+        },
+        {
+          id: "7",
+          title: "Optimize performance",
+          completed: false,
+        },
+        {
+          id: "8",
+          title: "Add dark mode",
+          completed: true,
+        },
+        {
+          id: "9",
+          title: "Implement keyboard shortcuts",
+          completed: true,
+        },
+        {
+          id: "10",
+          title: "Add virtual scrolling",
+          completed: false,
+        },
+      ]);
+    }
+    setIsTodosLoaded(true);
+  }, []);
+
+  // Save todos to localStorage whenever they change
+  React.useEffect(() => {
+    if (isClient && isTodosLoaded) {
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }
+  }, [todos, isClient, isTodosLoaded]);
+
+  // Initialize and update the todo list name based on visit count
+  React.useEffect(() => {
+    if (!isClient) return;
     
     // Get visit count from localStorage
     const storedVisitCount = localStorage.getItem("todoVisitCount");
@@ -87,7 +113,7 @@ export default function Home() {
     
     // Set the todo list name for this visit
     setTodoListName(newName);
-  }, []);
+  }, [isClient]);
 
   const remainingTasks = todos.filter(todo => !todo.completed).length;
   
@@ -100,6 +126,34 @@ export default function Home() {
     setIsAddModalOpen,
   });
 
+  // Show loading state until todos are loaded
+  if (!isTodosLoaded) {
+    return (
+      <div className="min-h-screen bg-background p-4 flex items-center justify-center" tabIndex={-1}>
+        <ModeToggle />
+        <div className="w-full max-w-md">
+          <Card>
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl min-h-[2rem]">
+                <span className="invisible">Placeholder</span>
+              </CardTitle>
+              <CardDescription>
+                Loading...
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="h-12 bg-muted rounded-lg animate-pulse"></div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background p-4 flex items-center justify-center" tabIndex={-1}>
       <ModeToggle />
@@ -110,7 +164,7 @@ export default function Home() {
               {isClient && todoListName ? todoListName : <span className="invisible">Placeholder</span>}
             </CardTitle>
             <CardDescription>
-              {remainingTasks} {remainingTasks === 1 ? 'task' : 'tasks'} remaining
+              {isClient ? `${remainingTasks} ${remainingTasks === 1 ? 'task' : 'tasks'} remaining` : "Loading..."}
             </CardDescription>
           </CardHeader>
           <CardContent>
