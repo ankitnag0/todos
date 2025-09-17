@@ -89,40 +89,14 @@ export default function Home() {
     setTodoListName(newName);
   }, []);
 
-  const handleToggle = (id: string) => {
-    setTodos(todos.map(todo => 
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    ));
-  };
-
-  const handleDelete = (id: string) => {
-    setTodos(todos.filter(todo => todo.id !== id));
-    // Adjust selected index if necessary
-    if (todos.length > 1 && selectedTaskIndex >= todos.length - 1) {
-      setSelectedTaskIndex(todos.length - 2);
-    }
-  };
-  
-  const handleAddTask = (title: string) => {
-    const newTask = {
-      id: Date.now().toString(),
-      title,
-      completed: false,
-    };
-    setTodos([...todos, newTask]);
-    // Select the newly added task
-    setSelectedTaskIndex(todos.length);
-  };
-
   const remainingTasks = todos.filter(todo => !todo.completed).length;
   
   // Use our custom keyboard shortcuts hook
   useKeyboardShortcuts({
     selectedTaskIndex,
     todos,
+    setTodos,
     setSelectedTaskIndex,
-    handleToggle,
-    handleDelete,
     setIsAddModalOpen,
   });
 
@@ -142,8 +116,10 @@ export default function Home() {
           <CardContent>
             <TodoList 
               todos={todos} 
-              onToggle={handleToggle}
-              onDelete={handleDelete}
+              onToggle={(id) => setTodos(todos.map(todo => 
+                todo.id === id ? { ...todo, completed: !todo.completed } : todo
+              ))}
+              onDelete={(id) => setTodos(todos.filter(todo => todo.id !== id))}
               selectedTaskIndex={selectedTaskIndex}
               className="space-y-3"
             />
@@ -155,7 +131,14 @@ export default function Home() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAdd={(title) => {
-          handleAddTask(title);
+          const newTask = {
+            id: Date.now().toString(),
+            title,
+            completed: false,
+          };
+          setTodos([...todos, newTask]);
+          // Select the newly added task
+          setSelectedTaskIndex(todos.length);
           setIsAddModalOpen(false);
         }}
       />
