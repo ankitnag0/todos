@@ -21,6 +21,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        e.preventDefault()
         onClose()
       }
     }
@@ -40,7 +41,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
     { key: "Shift + K", description: "Move task up" },
     { key: "u", description: "Undo delete" },
     { key: "o", description: "Toggle dark mode" },
-    { key: "?", description: "Show help" },
+    { key: "?", description: "Toggle help" },
   ]
 
   // Only render the modal content if shouldRender is true

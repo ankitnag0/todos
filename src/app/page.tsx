@@ -102,6 +102,7 @@ export default function Home() {
     setSelectedTaskIndexAction: setSelectedTaskIndex,
     setIsAddModalOpenAction: setIsAddModalOpen,
     setIsHelpModalOpenAction: setIsHelpModalOpen,
+    isHelpModalOpen,
   });
 
   // Show loading state until todos are loaded

@@ -21,6 +21,7 @@ export function useKeyboardShortcuts({
   setSelectedTaskIndexAction,
   setIsAddModalOpenAction,
   setIsHelpModalOpenAction,
+  isHelpModalOpen,
 }: {
   selectedTaskIndex: number
   todos: any[]
@@ -28,6 +29,7 @@ export function useKeyboardShortcuts({
   setSelectedTaskIndexAction: React.Dispatch<React.SetStateAction<number>>
   setIsAddModalOpenAction: React.Dispatch<React.SetStateAction<boolean>>
   setIsHelpModalOpenAction: React.Dispatch<React.SetStateAction<boolean>>
+  isHelpModalOpen: boolean
 }) {
   const { theme, setTheme } = useTheme()
 
@@ -39,8 +41,9 @@ export function useKeyboardShortcuts({
       // Ignore if focused on an input field
       if (isInputFocused()) return
 
-      // Prevent default behavior for keys we're using
-      if (["j", "k", " ", "Spacebar", "d", "n", "o", "O", "?", "x", "X", "u", "U"].includes(e.key)) {
+      // Prevent default behavior for keys we're using (except ? when help modal is open)
+      if ([ "j", "k", " ", "Spacebar", "d", "n", "o", "O", "x", "X", "u", "U"].includes(e.key) || 
+          (e.key === "?" && !isHelpModalOpen)) {
         e.preventDefault()
       }
 
@@ -95,8 +98,8 @@ export function useKeyboardShortcuts({
         // Toggle dark mode
         setTheme(theme === "dark" ? "light" : "dark")
       } else if (e.key === "?") {
-        // Open help modal
-        setIsHelpModalOpenAction(true)
+        // Toggle help modal
+        setIsHelpModalOpenAction(prev => !prev)
       } else if (e.key === "x" || e.key === "X") {
         // Delete all completed tasks
         const completedTodos = todos.filter((todo) => todo.completed);
@@ -187,6 +190,7 @@ export function useKeyboardShortcuts({
     setSelectedTaskIndexAction,
     setIsAddModalOpenAction,
     setIsHelpModalOpenAction,
+    isHelpModalOpen,
     theme,
     setTheme,
   ])
