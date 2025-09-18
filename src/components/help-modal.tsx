@@ -34,12 +34,13 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
     { key: "j", description: "Navigate down" },
     { key: "k", description: "Navigate up" },
     { key: "n", description: "New task" },
-    { key: "d", description: "Delete task" },
+    { key: "e", description: "Edit task" },
     { key: "Space", description: "Toggle task" },
+    { key: "d", description: "Delete task" },
     { key: "x", description: "Delete completed" },
+    { key: "u", description: "Undo delete" },
     { key: "Shift + J", description: "Move task down" },
     { key: "Shift + K", description: "Move task up" },
-    { key: "u", description: "Undo delete" },
     { key: "o", description: "Toggle dark mode" },
     { key: "?", description: "Toggle help" },
   ]
@@ -53,11 +54,11 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
   }
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
-      <div 
+      <div
         className="bg-background rounded-lg border p-6 w-full max-w-lg shadow-lg relative"
         onClick={(e) => e.stopPropagation()}
       >

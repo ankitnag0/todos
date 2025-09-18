@@ -21,6 +21,7 @@ export function useKeyboardShortcuts({
   setSelectedTaskIndexAction,
   setIsAddModalOpenAction,
   setIsHelpModalOpenAction,
+  setIsEditModalOpenAction,
   isHelpModalOpen,
 }: {
   selectedTaskIndex: number
@@ -29,6 +30,7 @@ export function useKeyboardShortcuts({
   setSelectedTaskIndexAction: React.Dispatch<React.SetStateAction<number>>
   setIsAddModalOpenAction: React.Dispatch<React.SetStateAction<boolean>>
   setIsHelpModalOpenAction: React.Dispatch<React.SetStateAction<boolean>>
+  setIsEditModalOpenAction?: React.Dispatch<React.SetStateAction<boolean>>
   isHelpModalOpen: boolean
 }) {
   const { theme, setTheme } = useTheme()
@@ -42,7 +44,7 @@ export function useKeyboardShortcuts({
       if (isInputFocused()) return
 
       // Prevent default behavior for keys we're using (except ? when help modal is open)
-      if ([ "j", "k", " ", "Spacebar", "d", "n", "o", "O", "x", "X", "u", "U"].includes(e.key) || 
+      if ([ "j", "k", " ", "Spacebar", "d", "n", "o", "O", "x", "X", "u", "U", "e", "E"].includes(e.key) || 
           (e.key === "?" && !isHelpModalOpen)) {
         e.preventDefault()
       }
@@ -94,6 +96,11 @@ export function useKeyboardShortcuts({
       } else if (e.key === "n") {
         // Open add task modal
         setIsAddModalOpenAction(true)
+      } else if (e.key === "e" || e.key === "E") {
+        // Open edit task modal if there's a selected task
+        if (todos.length > 0 && selectedTaskIndex < todos.length) {
+          setIsEditModalOpenAction?.(true)
+        }
       } else if (e.key === "o" || e.key === "O") {
         // Toggle dark mode
         setTheme(theme === "dark" ? "light" : "dark")
@@ -190,6 +197,7 @@ export function useKeyboardShortcuts({
     setSelectedTaskIndexAction,
     setIsAddModalOpenAction,
     setIsHelpModalOpenAction,
+    setIsEditModalOpenAction,
     isHelpModalOpen,
     theme,
     setTheme,

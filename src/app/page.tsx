@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { AddTaskModal } from "@/components/add-task-modal";
 import { ModeToggle } from "@/components/mode-toggle";
 import { HelpModal } from "@/components/help-modal";
+import { EditTaskModal } from "@/components/edit-task-modal";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { getCycledTodoListName } from "@/lib/todo-list-names";
 
@@ -16,6 +17,7 @@ export default function Home() {
   const [selectedTaskIndex, setSelectedTaskIndex] = React.useState(0);
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = React.useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
   const [todoListName, setTodoListName] = React.useState<string | null>(null);
   const [isClient, setIsClient] = React.useState(false);
 
@@ -102,6 +104,7 @@ export default function Home() {
     setSelectedTaskIndexAction: setSelectedTaskIndex,
     setIsAddModalOpenAction: setIsAddModalOpen,
     setIsHelpModalOpenAction: setIsHelpModalOpen,
+    setIsEditModalOpenAction: setIsEditModalOpen,
     isHelpModalOpen,
   });
 
@@ -179,6 +182,18 @@ export default function Home() {
       <HelpModal 
         isOpen={isHelpModalOpen}
         onClose={() => setIsHelpModalOpen(false)}
+      />
+      
+      <EditTaskModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        initialTitle={todos[selectedTaskIndex]?.title || ""}
+        onSave={(title) => {
+          setTodos(todos.map((todo, index) => 
+            index === selectedTaskIndex ? { ...todo, title } : todo
+          ));
+          setIsEditModalOpen(false);
+        }}
       />
     </div>
   );
