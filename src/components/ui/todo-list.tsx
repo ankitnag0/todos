@@ -21,7 +21,7 @@ const TodoList = React.forwardRef<HTMLUListElement, TodoListProps>(
     // Calculate the visible window of 5 todos centered around the selected item
     const [visibleStartIndex, setVisibleStartIndex] = React.useState(0)
 
-    // Update the visible window when selection changes
+    // Update the visible window when selection or todos change
     React.useEffect(() => {
       // Keep the selected item in view by adjusting the window
       if (selectedTaskIndex < visibleStartIndex) {
@@ -29,7 +29,13 @@ const TodoList = React.forwardRef<HTMLUListElement, TodoListProps>(
       } else if (selectedTaskIndex >= visibleStartIndex + 5) {
         setVisibleStartIndex(Math.max(0, selectedTaskIndex - 4))
       }
-    }, [selectedTaskIndex, visibleStartIndex])
+      // When todos are deleted, adjust the window to try to show 5 items if possible
+      else if (todos.length < visibleStartIndex + 5 && visibleStartIndex > 0) {
+        // Move the window back to try to show 5 items
+        const newStartIndex = Math.max(0, todos.length - 5)
+        setVisibleStartIndex(newStartIndex)
+      }
+    }, [selectedTaskIndex, visibleStartIndex, todos.length])
 
     // Get the visible todos (5 at a time)
     const visibleTodos = todos.slice(visibleStartIndex, visibleStartIndex + 5)

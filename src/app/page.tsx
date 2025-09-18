@@ -155,7 +155,23 @@ export default function Home() {
               onToggle={(id) => setTodos(todos.map(todo => 
                 todo.id === id ? { ...todo, completed: !todo.completed } : todo
               ))}
-              onDelete={(id) => setTodos(todos.filter(todo => todo.id !== id))}
+              onDelete={(id) => {
+                const deletedTodoIndex = todos.findIndex(todo => todo.id === id);
+                setTodos(todos.filter(todo => todo.id !== id));
+                // Adjust selected index if necessary
+                if (todos.length > 1) {
+                  if (deletedTodoIndex === selectedTaskIndex && selectedTaskIndex === todos.length - 1) {
+                    // If we deleted the last item and it was selected, select the new last item
+                    setSelectedTaskIndex(Math.max(0, todos.length - 2));
+                  } else if (deletedTodoIndex < selectedTaskIndex) {
+                    // If we deleted an item before the selected item, adjust the index
+                    setSelectedTaskIndex(Math.max(0, selectedTaskIndex - 1));
+                  }
+                } else {
+                  // If we deleted the last/only item, reset to 0
+                  setSelectedTaskIndex(0);
+                }
+              }}
               selectedTaskIndex={selectedTaskIndex}
               className="space-y-4"
             />
