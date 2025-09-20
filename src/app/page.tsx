@@ -7,6 +7,7 @@ import { AddTaskModal } from "@/components/add-task-modal";
 import { ModeToggle } from "@/components/mode-toggle";
 import { HelpModal } from "@/components/help-modal";
 import { EditTaskModal } from "@/components/edit-task-modal";
+import { AddTodoButton } from "@/components/add-todo-button";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { getCycledTodoListName } from "@/lib/todo-list-names";
 
@@ -43,22 +44,22 @@ export default function Home() {
         },
         {
           id: "2",
-          title: "Press Space to check/uncheck task",
+          title: "Press Space to check/uncheck tasks",
           completed: false,
         },
         {
           id: "3",
-          title: "n to create new tasks",
+          title: "Press n to create new tasks",
           completed: false,
         },
         {
           id: "4",
-          title: "d to delete selected task",
+          title: "Press d to delete selected tasks",
           completed: false,
         },
         {
           id: "5",
-          title: "? for help and all shortcuts",
+          title: "Press ? for help and all shortcuts",
           completed: false,
         },
       ]);
@@ -112,22 +113,34 @@ export default function Home() {
   if (!isTodosLoaded) {
     return (
       <div className="min-h-screen bg-background p-4 flex items-center justify-center" tabIndex={-1}>
-        <ModeToggle />
         <div className="w-full max-w-md">
           <Card>
-            <CardHeader className="text-center p-6">
-              <CardTitle className="text-2xl h-9 flex items-center justify-center mb-2">
-                <div className="h-7 bg-muted rounded w-52"></div>
-              </CardTitle>
-              <CardDescription className="h-6 flex items-center justify-center">
-                <span className="h-5 bg-muted rounded w-36 inline-block"></span>
-              </CardDescription>
+            <CardHeader className="p-6 pb-4 relative">
+              <div className="absolute top-4 right-4">
+                <ModeToggle />
+              </div>
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-2xl mb-1 text-left">
+                    <div className="h-7 bg-muted rounded w-52"></div>
+                  </CardTitle>
+                  <CardDescription className="text-left text-sm">
+                    <span className="h-5 bg-muted rounded w-36 inline-block"></span>
+                  </CardDescription>
+                </div>
+              </div>
             </CardHeader>
+            <div className="px-6 pt-0">
+              <div className="border-b border-border/50"></div>
+            </div>
             <CardContent className="p-6">
               <div className="space-y-4">
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="h-14 bg-muted rounded-lg"></div>
                 ))}
+              </div>
+              <div className="mt-6 flex justify-center">
+                <div className="h-9 rounded-md bg-muted"></div>
               </div>
             </CardContent>
           </Card>
@@ -138,17 +151,26 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background p-4 flex items-center justify-center" tabIndex={-1}>
-      <ModeToggle />
       <div className="w-full max-w-md">
         <Card>
-          <CardHeader className="text-center p-6">
-            <CardTitle className="text-2xl h-9 flex items-center justify-center mb-2">
-              {isClient && todoListName ? todoListName : <span className="invisible">Placeholder</span>}
-            </CardTitle>
-            <CardDescription className="h-6 flex items-center justify-center">
-              {isClient ? `${remainingTasks} ${remainingTasks === 1 ? 'task' : 'tasks'} remaining` : "Loading..."}
-            </CardDescription>
+          <CardHeader className="p-6 pb-4 relative">
+            <div className="absolute top-4 right-4">
+              <ModeToggle />
+            </div>
+            <div className="flex justify-between items-start gap-4">
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-2xl mb-1 text-left truncate">
+                  {isClient && todoListName ? todoListName : <span className="invisible">Placeholder</span>}
+                </CardTitle>
+                <CardDescription className="text-left text-sm">
+                  {isClient ? `${remainingTasks} ${remainingTasks === 1 ? 'task' : 'tasks'} remaining` : "Loading..."}
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
+          <div className="px-6 pt-0">
+            <div className="border-b border-border/50"></div>
+          </div>
           <CardContent className="p-6">
             <TodoList 
               todos={todos} 
@@ -175,6 +197,9 @@ export default function Home() {
               selectedTaskIndex={selectedTaskIndex}
               className="space-y-4"
             />
+            <div className="mt-6 flex justify-center">
+              <AddTodoButton onClick={() => setIsAddModalOpen(true)} />
+            </div>
           </CardContent>
         </Card>
       </div>

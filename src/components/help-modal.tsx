@@ -30,6 +30,20 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
     return () => document.removeEventListener("keydown", handleEscape)
   }, [onClose])
 
+  // Handle 'q' key to close the modal (secret feature)
+  React.useEffect(() => {
+    const handleQKey = (e: KeyboardEvent) => {
+      // Only close with 'q' when the help modal is open
+      if (isOpen && e.key === "q") {
+        e.preventDefault()
+        onClose()
+      }
+    }
+
+    document.addEventListener("keydown", handleQKey)
+    return () => document.removeEventListener("keydown", handleQKey)
+  }, [isOpen, onClose])
+
   const shortcuts = [
     { key: "j", description: "Navigate down" },
     { key: "k", description: "Navigate up" },
