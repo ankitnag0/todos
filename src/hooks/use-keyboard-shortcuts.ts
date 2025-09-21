@@ -3,6 +3,12 @@
 import * as React from "react"
 import { useTheme } from "next-themes"
 
+interface Todo {
+  id: string
+  title: string
+  completed: boolean
+}
+
 // Check if the active element is an input field
 export const isInputFocused = () => {
   const activeElement = document.activeElement
@@ -22,15 +28,17 @@ export function useKeyboardShortcuts({
   setIsAddModalOpenAction,
   setIsHelpModalOpenAction,
   setIsEditModalOpenAction,
+  setIsRenameModalOpenAction,
   isHelpModalOpen,
 }: {
   selectedTaskIndex: number
-  todos: any[]
-  setTodosAction: React.Dispatch<React.SetStateAction<any[]>>
+  todos: Todo[]
+  setTodosAction: React.Dispatch<React.SetStateAction<Todo[]>>
   setSelectedTaskIndexAction: React.Dispatch<React.SetStateAction<number>>
   setIsAddModalOpenAction: React.Dispatch<React.SetStateAction<boolean>>
   setIsHelpModalOpenAction: React.Dispatch<React.SetStateAction<boolean>>
   setIsEditModalOpenAction?: React.Dispatch<React.SetStateAction<boolean>>
+  setIsRenameModalOpenAction?: React.Dispatch<React.SetStateAction<boolean>>
   isHelpModalOpen: boolean
 }) {
   const { theme, setTheme } = useTheme()
@@ -44,7 +52,7 @@ export function useKeyboardShortcuts({
       if (isInputFocused()) return
 
       // Prevent default behavior for keys we're using (except ? when help modal is open)
-      if ([ "j", "k", " ", "Spacebar", "d", "n", "o", "O", "x", "X", "u", "U", "e", "E"].includes(e.key) || 
+      if ([ "j", "k", " ", "Spacebar", "d", "n", "o", "O", "x", "X", "u", "U", "e", "E", "r", "R"].includes(e.key) || 
           (e.key === "?" && !isHelpModalOpen)) {
         e.preventDefault()
       }
@@ -161,6 +169,9 @@ export function useKeyboardShortcuts({
             });
           }
         }
+      } else if (e.key === "r" || e.key === "R") {
+        // Open rename list modal
+        setIsRenameModalOpenAction?.(true)
       } else if (e.key === "J" || (e.key === "j" && e.shiftKey)) {
         // Move selected task down
         if (selectedTaskIndex < todos.length - 1) {
@@ -198,6 +209,7 @@ export function useKeyboardShortcuts({
     setIsAddModalOpenAction,
     setIsHelpModalOpenAction,
     setIsEditModalOpenAction,
+    setIsRenameModalOpenAction,
     isHelpModalOpen,
     theme,
     setTheme,

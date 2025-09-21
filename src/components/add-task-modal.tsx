@@ -49,7 +49,7 @@ export function AddTaskModal({ isOpen, onClose, onAdd }: AddTaskModalProps) {
   // Handle Enter key to submit
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && title.trim()) {
-      handleSubmit(e as any)
+      handleSubmit(e as unknown as React.FormEvent);
       onClose()
     } else if (e.key === "Escape") {
       onClose()

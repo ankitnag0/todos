@@ -11,13 +11,13 @@ interface Todo {
 
 interface TodoListProps extends React.HTMLAttributes<HTMLUListElement> {
   todos: Todo[]
-  onToggle?: (id: string) => void
+  onToggleTodo?: (id: string) => void
   onDelete?: (id: string) => void
   selectedTaskIndex?: number
 }
 
 const TodoList = React.forwardRef<HTMLUListElement, TodoListProps>(
-  ({ className, todos, onToggle, onDelete, selectedTaskIndex = 0, ...props }, ref) => {
+  ({ className, todos, onToggleTodo, onDelete, selectedTaskIndex = 0, ...props }, ref) => {
     // Calculate the visible window of 5 todos centered around the selected item
     const [visibleStartIndex, setVisibleStartIndex] = React.useState(0)
 
@@ -46,13 +46,13 @@ const TodoList = React.forwardRef<HTMLUListElement, TodoListProps>(
           const actualIndex = visibleStartIndex + index
           return (
             <TodoItem
-              key={todo.id}
-              title={todo.title}
-              completed={todo.completed}
-              onToggle={() => onToggle?.(todo.id)}
-              onDelete={() => onDelete?.(todo.id)}
-              isSelected={actualIndex === selectedTaskIndex}
-            />
+  key={todo.id}
+  title={todo.title}
+  completed={todo.completed}
+  onToggle={() => onToggleTodo?.(todo.id)}
+  onDelete={() => onDelete?.(todo.id)}
+  isSelected={actualIndex === selectedTaskIndex}
+/>
           )
         })}
       </ul>
