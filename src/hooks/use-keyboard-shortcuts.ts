@@ -2,12 +2,7 @@
 
 import * as React from "react"
 import { useTheme } from "next-themes"
-
-interface Todo {
-  id: string
-  title: string
-  completed: boolean
-}
+import { Todo } from "@/types/todo"
 
 // Check if the active element is an input field
 export const isInputFocused = () => {

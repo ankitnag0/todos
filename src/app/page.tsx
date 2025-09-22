@@ -10,91 +10,96 @@ import { EditTaskModal } from "@/components/edit-task-modal"
 import { RenameModal } from "@/components/rename-modal"
 import { AddTodoButton } from "@/components/add-todo-button"
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Todo, TodoList as TodoListType } from "@/types/todo"
 
 export default function Home() {
-  // Load todos from localStorage or use default todos
-  const [todos, setTodos] = React.useState<{ id: string; title: string; completed: boolean }[]>([])
+  // Load todo lists from localStorage or use default
+  const [todoLists, setTodoLists] = React.useState<TodoListType[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [currentListIndex, setCurrentListIndex] = React.useState(0)
   const [isTodosLoaded, setIsTodosLoaded] = React.useState(false)
   const [selectedTaskIndex, setSelectedTaskIndex] = React.useState(0)
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false)
   const [isHelpModalOpen, setIsHelpModalOpen] = React.useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false)
   const [isRenameModalOpen, setIsRenameModalOpen] = React.useState(false)
-  const [todoListName, setTodoListName] = React.useState("Todos")
   const [isClient, setIsClient] = React.useState(false)
 
-  // Load todos from localStorage on client mount
+  // Get current list
+  const currentList = todoLists[currentListIndex] || { id: "1", name: "Todos", todos: [] }
+
+  // Load todo lists from localStorage on client mount
   React.useEffect(() => {
     setIsClient(true)
-    
-    // Load todo list name from localStorage
-    const savedTodoListName = localStorage.getItem('todoListName')
-    if (savedTodoListName) {
-      setTodoListName(savedTodoListName)
-    }
-    
-    const savedTodos = localStorage.getItem('todos')
-    if (savedTodos) {
-      const parsedTodos = JSON.parse(savedTodos)
-      setTodos(parsedTodos)
+
+    const savedTodoLists = localStorage.getItem('todoLists')
+    if (savedTodoLists) {
+      const parsedLists = JSON.parse(savedTodoLists)
+      setTodoLists(parsedLists)
       // Also update the selected index if needed
-      if (parsedTodos.length > 0 && selectedTaskIndex >= parsedTodos.length) {
-        setSelectedTaskIndex(Math.max(0, parsedTodos.length - 1))
+      if (parsedLists.length > 0 && parsedLists[currentListIndex] && selectedTaskIndex >= parsedLists[currentListIndex].todos.length) {
+        setSelectedTaskIndex(Math.max(0, parsedLists[currentListIndex].todos.length - 1))
       }
     } else {
-      // If no saved todos, use the default list as a guide
-      setTodos([
-        {
-          id: "1",
-          title: "Use j/k to move up and down",
-          completed: false,
-        },
-        {
-          id: "2",
-          title: "Press Space to check/uncheck tasks",
-          completed: false,
-        },
-        {
-          id: "3",
-          title: "Press n to create new tasks",
-          completed: false,
-        },
-        {
-          id: "4",
-          title: "Press d to delete selected tasks",
-          completed: false,
-        },
-        {
-          id: "5",
-          title: "Press ? for help and all shortcuts",
-          completed: false,
-        },
-      ])
+      // If no saved lists, create a default list
+      const defaultList: TodoListType = {
+        id: "1",
+        name: "Todos",
+        todos: [
+          {
+            id: "1",
+            title: "Use j/k to move up and down",
+            completed: false,
+          },
+          {
+            id: "2",
+            title: "Press Space to check/uncheck tasks",
+            completed: false,
+          },
+          {
+            id: "3",
+            title: "Press n to create new tasks",
+            completed: false,
+          },
+          {
+            id: "4",
+            title: "Press d to delete selected tasks",
+            completed: false,
+          },
+          {
+            id: "5",
+            title: "Press ? for help and all shortcuts",
+            completed: false,
+          },
+        ]
+      }
+      setTodoLists([defaultList])
     }
     setIsTodosLoaded(true)
-  }, [])
+  }, [currentListIndex, selectedTaskIndex])
 
-  // Save todos to localStorage whenever they change
+  // Save todo lists to localStorage whenever they change
   React.useEffect(() => {
     if (isClient && isTodosLoaded) {
-      localStorage.setItem('todos', JSON.stringify(todos))
+      localStorage.setItem('todoLists', JSON.stringify(todoLists))
     }
-  }, [todos, isClient, isTodosLoaded])
+  }, [todoLists, isClient, isTodosLoaded])
 
-  // Save todo list name to localStorage whenever it changes
-  React.useEffect(() => {
-    if (isClient) {
-      localStorage.setItem('todoListName', todoListName)
-    }
-  }, [todoListName, isClient])
+  const remainingTasks = currentList.todos.filter(todo => !todo.completed).length
 
-  const remainingTasks = todos.filter(todo => !todo.completed).length
-  
   // Use our custom keyboard shortcuts hook
   useKeyboardShortcuts({
     selectedTaskIndex,
-    todos,
-    setTodosAction: setTodos,
+    todos: currentList.todos,
+    setTodosAction: (newTodos) => {
+      const updatedLists = [...todoLists];
+      updatedLists[currentListIndex] = {
+        ...currentList,
+        todos: Array.isArray(newTodos) ? newTodos : newTodos(currentList.todos)
+      };
+      setTodoLists(updatedLists);
+    },
     setSelectedTaskIndexAction: setSelectedTaskIndex,
     setIsAddModalOpenAction: setIsAddModalOpen,
     setIsHelpModalOpenAction: setIsHelpModalOpen,
@@ -154,7 +159,7 @@ export default function Home() {
             <div className="flex justify-between items-start gap-4">
               <div className="flex-1 min-w-0">
                 <CardTitle className="text-2xl mb-1 text-left truncate">
-                  {todoListName}
+                  {currentList.name}
                 </CardTitle>
                 <CardDescription className="text-left text-sm">
                   {isClient ? `${remainingTasks} ${remainingTasks === 1 ? 'task' : 'tasks'} remaining` : "Loading..."}
@@ -166,19 +171,31 @@ export default function Home() {
             <div className="border-b border-border/50"></div>
           </div>
           <CardContent className="p-6">
-            <TodoList 
-              todos={todos} 
-              onToggleTodo={(id) => setTodos(todos.map(todo => 
-                todo.id === id ? { ...todo, completed: !todo.completed } : todo
-              ))}
+            <TodoList
+              todos={currentList.todos}
+              onToggleTodo={(id) => {
+                const updatedLists = [...todoLists]
+                updatedLists[currentListIndex] = {
+                  ...currentList,
+                  todos: currentList.todos.map(todo =>
+                    todo.id === id ? { ...todo, completed: !todo.completed } : todo
+                  )
+                }
+                setTodoLists(updatedLists)
+              }}
               onDelete={(id) => {
-                const deletedTodoIndex = todos.findIndex(todo => todo.id === id)
-                setTodos(todos.filter(todo => todo.id !== id))
+                const deletedTodoIndex = currentList.todos.findIndex(todo => todo.id === id)
+                const updatedLists = [...todoLists]
+                updatedLists[currentListIndex] = {
+                  ...currentList,
+                  todos: currentList.todos.filter(todo => todo.id !== id)
+                }
+                setTodoLists(updatedLists)
                 // Adjust selected index if necessary
-                if (todos.length > 1) {
-                  if (deletedTodoIndex === selectedTaskIndex && selectedTaskIndex === todos.length - 1) {
+                if (currentList.todos.length > 1) {
+                  if (deletedTodoIndex === selectedTaskIndex && selectedTaskIndex === currentList.todos.length - 1) {
                     // If we deleted the last item and it was selected, select the new last item
-                    setSelectedTaskIndex(Math.max(0, todos.length - 2))
+                    setSelectedTaskIndex(Math.max(0, currentList.todos.length - 2))
                   } else if (deletedTodoIndex < selectedTaskIndex) {
                     // If we deleted an item before the selected item, adjust the index
                     setSelectedTaskIndex(Math.max(0, selectedTaskIndex - 1))
@@ -197,8 +214,8 @@ export default function Home() {
           </CardContent>
         </Card>
       </div>
-      
-      <AddTaskModal 
+
+      <AddTaskModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAdd={(title) => {
@@ -207,36 +224,51 @@ export default function Home() {
             title,
             completed: false,
           }
-          setTodos([...todos, newTask])
+          const updatedLists = [...todoLists]
+          updatedLists[currentListIndex] = {
+            ...currentList,
+            todos: [...currentList.todos, newTask]
+          }
+          setTodoLists(updatedLists)
           // Select the newly added task
-          setSelectedTaskIndex(todos.length)
+          setSelectedTaskIndex(currentList.todos.length)
           setIsAddModalOpen(false)
         }}
       />
-      
-      <HelpModal 
+
+      <HelpModal
         isOpen={isHelpModalOpen}
         onClose={() => setIsHelpModalOpen(false)}
       />
-      
+
       <EditTaskModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        initialTitle={todos[selectedTaskIndex]?.title || ""}
+        initialTitle={currentList.todos[selectedTaskIndex]?.title || ""}
         onSave={(title) => {
-          setTodos(todos.map((todo, index) => 
-            index === selectedTaskIndex ? { ...todo, title } : todo
-          ))
+          const updatedLists = [...todoLists]
+          updatedLists[currentListIndex] = {
+            ...currentList,
+            todos: currentList.todos.map((todo, index) =>
+              index === selectedTaskIndex ? { ...todo, title } : todo
+            )
+          }
+          setTodoLists(updatedLists)
           setIsEditModalOpen(false)
         }}
       />
-      
+
       <RenameModal
         isOpen={isRenameModalOpen}
         onClose={() => setIsRenameModalOpen(false)}
-        initialName={todoListName}
+        initialName={currentList.name}
         onSave={(name) => {
-          setTodoListName(name)
+          const updatedLists = [...todoLists]
+          updatedLists[currentListIndex] = {
+            ...currentList,
+            name
+          }
+          setTodoLists(updatedLists)
           setIsRenameModalOpen(false)
         }}
       />

@@ -2,12 +2,7 @@
 
 import * as React from "react"
 import { TodoItem } from "@/components/ui/todo-item"
-
-interface Todo {
-  id: string
-  title: string
-  completed: boolean
-}
+import { Todo } from "@/types/todo"
 
 interface TodoListProps extends React.HTMLAttributes<HTMLUListElement> {
   todos: Todo[]
