@@ -61,6 +61,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
     { key: "r", description: "Rename list" },
     { key: "h", description: "Previous list" },
     { key: "l", description: "Next list" },
+    { key: "Shift + D", description: "Delete list" },
   ]
 
   // Only render the modal content if shouldRender is true

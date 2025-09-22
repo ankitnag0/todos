@@ -43,6 +43,24 @@ export default function Home() {
     })
   }, [setTodoLists, setCurrentListIndex, setSelectedTaskIndex])
 
+  // Function to delete the current todo list
+  const deleteList = React.useCallback(() => {
+    // Don't delete the last list
+    if (todoLists.length <= 1) return;
+    
+    setTodoLists(prev => {
+      const updatedLists = prev.filter((_, index) => index !== currentListIndex);
+      // Adjust the current list index if needed
+      const newCurrentIndex = currentListIndex >= updatedLists.length 
+        ? updatedLists.length - 1 
+        : currentListIndex;
+      setCurrentListIndex(newCurrentIndex);
+      // Reset selected task index
+      setSelectedTaskIndex(0);
+      return updatedLists;
+    });
+  }, [todoLists.length, currentListIndex, setTodoLists, setCurrentListIndex, setSelectedTaskIndex]);
+
   // Get current list
   const currentList = todoLists[currentListIndex] || { id: "1", name: "Todos", todos: [] }
 
@@ -123,6 +141,7 @@ export default function Home() {
     setIsEditModalOpenAction: setIsEditModalOpen,
     setIsRenameModalOpenAction: setIsRenameModalOpen,
     onCreateNewListAction: createNewList,
+    onDeleteListAction: deleteList,
     currentListIndex,
     totalLists: todoLists.length,
     setCurrentListIndexAction: setCurrentListIndex,

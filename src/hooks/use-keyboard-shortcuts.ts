@@ -25,6 +25,7 @@ export function useKeyboardShortcuts({
   setIsEditModalOpenAction,
   setIsRenameModalOpenAction,
   onCreateNewListAction,
+  onDeleteListAction,
   currentListIndex,
   totalLists,
   setCurrentListIndexAction,
@@ -39,6 +40,7 @@ export function useKeyboardShortcuts({
   setIsEditModalOpenAction?: React.Dispatch<React.SetStateAction<boolean>>
   setIsRenameModalOpenAction?: React.Dispatch<React.SetStateAction<boolean>>
   onCreateNewListAction?: React.Dispatch<React.SetStateAction<void>>
+  onDeleteListAction?: React.Dispatch<React.SetStateAction<void>>
   currentListIndex: number
   totalLists: number
   setCurrentListIndexAction?: React.Dispatch<React.SetStateAction<number>>
@@ -55,7 +57,7 @@ export function useKeyboardShortcuts({
       if (isInputFocused()) return
 
       // Prevent default behavior for keys we're using (except ? when help modal is open)
-      if ([ "j", "k", " ", "Spacebar", "d", "n", "o", "O", "x", "X", "u", "U", "e", "E", "r", "R", "N"].includes(e.key) || 
+      if ([ "j", "k", " ", "Spacebar", "d", "n", "o", "O", "x", "X", "u", "U", "e", "E", "r", "R", "N", "D"].includes(e.key) || 
           (e.key === "?" && !isHelpModalOpen)) {
         e.preventDefault()
       }
@@ -190,6 +192,9 @@ export function useKeyboardShortcuts({
       } else if (e.key === "N" && e.shiftKey) {
         // Create new todo list
         onCreateNewListAction?.()
+      } else if (e.key === "D" && e.shiftKey) {
+        // Delete current todo list
+        onDeleteListAction?.()
       } else if (e.key === "J" || (e.key === "j" && e.shiftKey)) {
         // Move selected task down
         if (selectedTaskIndex < todos.length - 1) {
@@ -229,6 +234,7 @@ export function useKeyboardShortcuts({
     setIsEditModalOpenAction,
     setIsRenameModalOpenAction,
     onCreateNewListAction,
+    onDeleteListAction,
     currentListIndex,
     totalLists,
     setCurrentListIndexAction,
