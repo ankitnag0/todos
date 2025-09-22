@@ -26,6 +26,23 @@ export default function Home() {
   const [isRenameModalOpen, setIsRenameModalOpen] = React.useState(false)
   const [isClient, setIsClient] = React.useState(false)
 
+  // Function to create a new todo list
+  const createNewList = React.useCallback(() => {
+    setTodoLists(prev => {
+      const newList: TodoListType = {
+        id: Date.now().toString(),
+        name: `List ${prev.length + 1}`,
+        todos: []
+      }
+      const updatedLists = [...prev, newList];
+      // Set the current list to the newly created list
+      setCurrentListIndex(updatedLists.length - 1)
+      // Reset selected task index for the new list
+      setSelectedTaskIndex(0)
+      return updatedLists
+    })
+  }, [setTodoLists, setCurrentListIndex, setSelectedTaskIndex])
+
   // Get current list
   const currentList = todoLists[currentListIndex] || { id: "1", name: "Todos", todos: [] }
 
@@ -77,14 +94,14 @@ export default function Home() {
       setTodoLists([defaultList])
     }
     setIsTodosLoaded(true)
-  }, [currentListIndex, selectedTaskIndex])
+  }, [])
 
   // Save todo lists to localStorage whenever they change
   React.useEffect(() => {
-    if (isClient && isTodosLoaded) {
+    if (isClient) {
       localStorage.setItem('todoLists', JSON.stringify(todoLists))
     }
-  }, [todoLists, isClient, isTodosLoaded])
+  }, [todoLists, isClient])
 
   const remainingTasks = currentList.todos.filter(todo => !todo.completed).length
 
@@ -105,6 +122,10 @@ export default function Home() {
     setIsHelpModalOpenAction: setIsHelpModalOpen,
     setIsEditModalOpenAction: setIsEditModalOpen,
     setIsRenameModalOpenAction: setIsRenameModalOpen,
+    onCreateNewListAction: createNewList,
+    currentListIndex,
+    totalLists: todoLists.length,
+    setCurrentListIndexAction: setCurrentListIndex,
     isHelpModalOpen,
   })
 

@@ -57,6 +57,10 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
     { key: "Shift + K", description: "Move task up" },
     { key: "o", description: "Toggle dark mode" },
     { key: "?", description: "Toggle help" },
+    { key: "Shift + N", description: "New list" },
+    { key: "r", description: "Rename list" },
+    { key: "h", description: "Previous list" },
+    { key: "l", description: "Next list" },
   ]
 
   // Only render the modal content if shouldRender is true

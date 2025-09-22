@@ -24,6 +24,10 @@ export function useKeyboardShortcuts({
   setIsHelpModalOpenAction,
   setIsEditModalOpenAction,
   setIsRenameModalOpenAction,
+  onCreateNewListAction,
+  currentListIndex,
+  totalLists,
+  setCurrentListIndexAction,
   isHelpModalOpen,
 }: {
   selectedTaskIndex: number
@@ -34,6 +38,10 @@ export function useKeyboardShortcuts({
   setIsHelpModalOpenAction: React.Dispatch<React.SetStateAction<boolean>>
   setIsEditModalOpenAction?: React.Dispatch<React.SetStateAction<boolean>>
   setIsRenameModalOpenAction?: React.Dispatch<React.SetStateAction<boolean>>
+  onCreateNewListAction?: React.Dispatch<React.SetStateAction<void>>
+  currentListIndex: number
+  totalLists: number
+  setCurrentListIndexAction?: React.Dispatch<React.SetStateAction<number>>
   isHelpModalOpen: boolean
 }) {
   const { theme, setTheme } = useTheme()
@@ -47,13 +55,25 @@ export function useKeyboardShortcuts({
       if (isInputFocused()) return
 
       // Prevent default behavior for keys we're using (except ? when help modal is open)
-      if ([ "j", "k", " ", "Spacebar", "d", "n", "o", "O", "x", "X", "u", "U", "e", "E", "r", "R"].includes(e.key) || 
+      if ([ "j", "k", " ", "Spacebar", "d", "n", "o", "O", "x", "X", "u", "U", "e", "E", "r", "R", "N"].includes(e.key) || 
           (e.key === "?" && !isHelpModalOpen)) {
         e.preventDefault()
       }
 
       // Navigation keys
-      if (e.key === "j" && !e.shiftKey) {
+      if (e.key === "h" && !e.shiftKey) {
+        // Cycle to previous list
+        if (totalLists > 0) {
+          setCurrentListIndexAction?.(prev => (prev === 0 ? totalLists - 1 : prev - 1))
+          setSelectedTaskIndexAction(0)
+        }
+      } else if (e.key === "l" && !e.shiftKey) {
+        // Cycle to next list
+        if (totalLists > 0) {
+          setCurrentListIndexAction?.(prev => (prev === totalLists - 1 ? 0 : prev + 1))
+          setSelectedTaskIndexAction(0)
+        }
+      } else if (e.key === "j" && !e.shiftKey) {
         // Move down (next task)
         setSelectedTaskIndexAction((prev) => Math.min(prev + 1, todos.length - 1))
       } else if (e.key === "k" && !e.shiftKey) {
@@ -167,6 +187,9 @@ export function useKeyboardShortcuts({
       } else if (e.key === "r" || e.key === "R") {
         // Open rename list modal
         setIsRenameModalOpenAction?.(true)
+      } else if (e.key === "N" && e.shiftKey) {
+        // Create new todo list
+        onCreateNewListAction?.()
       } else if (e.key === "J" || (e.key === "j" && e.shiftKey)) {
         // Move selected task down
         if (selectedTaskIndex < todos.length - 1) {
@@ -205,6 +228,10 @@ export function useKeyboardShortcuts({
     setIsHelpModalOpenAction,
     setIsEditModalOpenAction,
     setIsRenameModalOpenAction,
+    onCreateNewListAction,
+    currentListIndex,
+    totalLists,
+    setCurrentListIndexAction,
     isHelpModalOpen,
     theme,
     setTheme,
