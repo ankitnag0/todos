@@ -1,0 +1,1 @@
+ExecStart=/home/ankit/.local/share/mise/installs/bun/1.2.20/bin/bun run start

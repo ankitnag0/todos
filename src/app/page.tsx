@@ -9,6 +9,7 @@ import { HelpModal } from "@/components/help-modal"
 import { EditTaskModal } from "@/components/edit-task-modal"
 import { RenameModal } from "@/components/rename-modal"
 import { AddTodoButton } from "@/components/add-todo-button"
+import { ConfirmDeleteListModal } from "@/components/confirm-delete-list-modal"
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Todo, TodoList as TodoListType } from "@/types/todo"
@@ -25,6 +26,7 @@ export default function Home() {
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false)
   const [isRenameModalOpen, setIsRenameModalOpen] = React.useState(false)
   const [isClient, setIsClient] = React.useState(false)
+  const [isDeleteListModalOpen, setIsDeleteListModalOpen] = React.useState(false)
 
   // Function to create a new todo list
   const createNewList = React.useCallback(() => {
@@ -141,7 +143,7 @@ export default function Home() {
     setIsEditModalOpenAction: setIsEditModalOpen,
     setIsRenameModalOpenAction: setIsRenameModalOpen,
     onCreateNewListAction: createNewList,
-    onDeleteListAction: deleteList,
+    onDeleteListAction: () => { if (todoLists.length > 1) setIsDeleteListModalOpen(true) },
     currentListIndex,
     totalLists: todoLists.length,
     setCurrentListIndexAction: setCurrentListIndex,
@@ -311,6 +313,13 @@ export default function Home() {
           setTodoLists(updatedLists)
           setIsRenameModalOpen(false)
         }}
+      />
+
+      <ConfirmDeleteListModal
+        isOpen={isDeleteListModalOpen}
+        onClose={() => setIsDeleteListModalOpen(false)}
+        onConfirm={deleteList}
+        listName={currentList.name}
       />
     </div>
   )

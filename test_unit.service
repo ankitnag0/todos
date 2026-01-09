@@ -1,0 +1,28 @@
+[Unit]
+Description=Todos
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+# The user the service should run as (will be set by installer)
+User=ankit
+# The working directory of your Next.js project
+WorkingDirectory=/home/ankit/ankit/ztrash/learning/nextjs/todos
+# Environment
+Environment=NODE_ENV=production
+Environment=PORT=19848
+# Optionally ensure Node/npm are on PATH if not globally available
+# Adjust PATH below if needed, or leave blank to inherit
+Environment=PATH=/home/ankit/.local/share/mise/installs/bun/1.2.20/bin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# Start command (uses npm so it picks up scripts from package.json)
+ExecStart=/home/ankit/.local/share/mise/installs/bun/1.2.20/bin/bun
+Restart=always
+RestartSec=10
+# Log to journald with a fixed identifier
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=todos
+
+[Install]
+WantedBy=multi-user.target
